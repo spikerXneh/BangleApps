@@ -4,6 +4,7 @@
   "icon": "app.png",
   "version":"0.01",
   "description": "This is a remake of my original pebble watchface",
+  "type": "clock",
   "tags": "clock",
   "supports": ["BANGLEJS2"],
   "screenshots": [{"url":"download.png"}],
