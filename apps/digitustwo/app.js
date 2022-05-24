@@ -201,7 +201,7 @@ function getWeather() {
       wind[2] +
       " " +
         (currentWeather.wrose || "").toUpperCase();
-      (currentWeather.wrose || "").toUpperCase();;
+      (currentWeather.wrose || "").toUpperCase();
     const code = currentWeather.code || -1;
     if (code > 0) {
       clockLayout.weatherIcon.src = chooseIconByCode(code);
