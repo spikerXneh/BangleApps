@@ -299,6 +299,6 @@ function queueDraw() {
 g.setBgColor(0,0,0);
 queueDraw();
 drawClock();
-Bangle.setUI("clock");
 Bangle.loadWidgets();
+Bangle.setUI("clock");
 Bangle.drawWidgets();
