@@ -104,18 +104,19 @@ let errIcon = require("heatshrink").decompress(
 
 // config stuff
 let twentyFourHourTime = false;
-let useFahrenheit = false;
 let hourColor = "#F00";
 let minuteColor = "#FFF";
+let dateColor = "#FFF";
+let temperatureColor = "#FFF";
 
 // layout
 var clockLayout = new Layout({
   type: "v",
   lazy: true,
   c: [
-    { type: "txt", font: "20%", label: "12:00", id: "hour"},
-    { type: "txt", font: "10%", label: "12:00", id: "minute" },
-    {type: "img",  id: "weatherIcon", src: sunIcon},
+    { type: "txt", font: "30%", label: "12:00", id: "hour"},
+    { type: "txt", font: "20%", label: "12:00", id: "minute" },
+    { type: "img",  id: "weatherIcon", src: sunIcon },
     { type: "txt", font: "6x8", label: "", id: "tempandwind" },
     { type: "txt", font: "6x8", label: "The Date", id: "date" },
   ],
@@ -154,36 +155,18 @@ function drawClock() {
 
   getDay();
   getWeather();
-  clockLayout.hour.halign = "-1";
   clockLayout.hour.col = hourColor;
   clockLayout.hour.label = timeString;
 
-  clockLayout.minute.halign = "-1";
   clockLayout.minute.col = minuteColor;
   clockLayout.minute.label = minuteString;
-  // g.setColor(255,0,0);
-  // g.setFont(fontFace,2);
-  // g.drawString(timeString, 1, 35);
-  // g.setColor(0,0,0);
-  // g.setFont(fontFace,2);
-  // g.drawString(minuteString, 1, 65);
   clockLayout.clear();
   clockLayout.render();
 }
 
 function getDay() {
   const d = new Date();
-  let dayOfWeek = d.getDay();
-  let dayOfMonth = d.getDate();
-  let month = months[d.getMonth()];
-  let dayString = days[dayOfWeek];
-
-  g.setFont(fontFace, 1);
-  // g.drawString(
-  //   dayString + ", " + month + " " + dayOfMonth + " " + d.getFullYear(),
-  //   1,
-  //   160
-  // );
+  clockLayout.date.col = dateColor;
   clockLayout.date.label = locale.date(d, 1).toUpperCase();
 }
 
@@ -191,17 +174,12 @@ function getWeather() {
   var weatherJson = storage.readJSON("weather.json");
   if (weatherJson && weatherJson.weather) {
     var currentWeather = weatherJson.weather;
-        const wind = locale.speed(currentWeather.wind).match(/^(\D*\d*)(.*)$/);
     let temp = locale
       .temp(currentWeather.temp - 273.15)
       .match(/^(\D*\d*)(.*)$/);
 
-      clockLayout.tempandwind.label = temp[1] + " " + temp[2] + ", " +  wind[1] +
-      " " +
-      wind[2] +
-      " " +
-        (currentWeather.wrose || "").toUpperCase();
-      (currentWeather.wrose || "").toUpperCase();
+    clockLayout.tempandwind.col = temperatureColor;
+    clockLayout.tempandwind.label = temp[1] + " " + temp[2];
     const code = currentWeather.code || -1;
     if (code > 0) {
       clockLayout.weatherIcon.src = chooseIconByCode(code);
