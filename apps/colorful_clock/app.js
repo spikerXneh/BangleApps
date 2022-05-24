@@ -196,13 +196,7 @@ function getWeather() {
       .temp(currentWeather.temp - 273.15)
       .match(/^(\D*\d*)(.*)$/);
 
-      clockLayout.tempandwind.label = temp[1] + " " + temp[2];
-	  // + ", " +  wind[1] +
-      // " " +
-      // wind[2] +
-      // " " +
-        // (currentWeather.wrose || "").toUpperCase();
-      // (currentWeather.wrose || "").toUpperCase();
+    clockLayout.tempandwind.label = temp[1] + " " + temp[2];
     const code = currentWeather.code || -1;
     if (code > 0) {
       clockLayout.weatherIcon.src = chooseIconByCode(code);
