@@ -277,7 +277,6 @@ function chooseIconByCode(code) {
         default:
           return cloudIcon;
       }
-      break;
     default:
       return cloudIcon;
   }
