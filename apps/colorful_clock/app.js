@@ -1,247 +1,305 @@
-  let ScreenWidth  = g.getWidth(),  CenterX = ScreenWidth/2;
-  let ScreenHeight = g.getHeight(), CenterY = ScreenHeight/2;
+//var http = require("http");
+const fontFace = "Dylex7x13";
+const locale = require("locale");
+const Layout = require("Layout");
+const storage = require("Storage");
+require("FontDylex7x13").add(Graphics);
 
-  let outerRadius = Math.min(CenterX,CenterY) * 0.9;
+//require("https://github.com/espruino/EspruinoDocs/blob/master/devices/PCD8544.js");
+//var  on = false;
 
-  Bangle.loadWidgets();
+let tens = ["", "", "twenty", "thirty", "forty", "fifty"];
+let ones = [
+  "",
+  "one",
+  "two",
+  "three",
+  "four",
+  "five",
+  "six",
+  "seven",
+  "eight",
+  "nine",
+  "ten",
+  "eleven",
+  "twelve",
+  "thirteen",
+  "fourteen",
+  "fifteen",
+  "sixteen",
+  "seventeen",
+  "eighteen",
+  "nineteen",
+];
+let days = [
+  "",
+  "monday",
+  "tuesday",
+  "wednesday",
+  "thursday",
+  "friday",
+  "saturday",
+  "sunday",
+];
+let months = [
+  "",
+  "jan.",
+  "feb.",
+  "mar.",
+  "apr.",
+  "may",
+  "june",
+  "july",
+  "aug.",
+  "sept.",
+  "oct.",
+  "nov.",
+  "dec.",
+];
+let singles = ["o'", "oh", "aught"];
 
-/**** updateClockFaceSize ****/
+// weather icons from https://icons8.com/icon/set/weather/color
+let sunIcon = require("heatshrink").decompress(
+  atob(
+    "mEwwhC/AH4AbhvQC6vd7ouVC4IwUCwIwUFwQwQCYgAHDZQXc9wACC6QWDDAgXN7wXF9oXPCwowDC5guGGAYXMCw4wCC5RGJJAZGTJBiNISIylQVJrLCC5owGF65fXR7AwBC5jvhC7JIILxapDFxAXOGAy9KC4owGBAQXODAgHDC54AHC8T0FAAQSOGg4qPGA4WUGAIuVC7AA/AH4AEA="
+  )
+);
 
-  function updateClockFaceSize () {
-    CenterX = ScreenWidth/2;
-    CenterY = ScreenHeight/2;
+let partSunIcon = require("heatshrink").decompress(
+  atob(
+    "mEwwhC/AH4AY6AWVhvdC6vd7owUFwIABFiYAFGR4Xa93u9oXTCwIYDC6HeC4fuC56MBC4ySOIwpIQXYQXHmYABRpwXECwQYKF5HjC4kwL5gQCAYYwO7wqFAAowK7wWKJBgXLJBPd6YX/AAoVMAAM/Cw0DC5yRHCx5JGFyAwGCyIwFC/4XyR4inXa64wRFwowQCw4A/AH4AkA"
+  )
+);
 
-    outerRadius = Math.min(CenterX,CenterY) * 0.9;
+let cloudIcon = require("heatshrink").decompress(
+  atob(
+    "mEwwhC/AH4A/AH4AtgczmYWWDCgWDmcwIKAuEGBoSGGCAWKC7BIKIxYX6CpgABn4tUSJIWPJIwuQGAwWRGAoX/C+SPEU67XXGCIuFGCAWHAH4A/AH4A/ADg="
+  )
+);
 
-    if (global.WIDGETS == null) { return; }
+let snowIcon = require("heatshrink").decompress(
+  atob(
+    "mEwwhC/AH4AhxGAC9YUBC4QZRhAVBAIWIC6QAEI6IYEI5cIBgwWOC64NCKohHPNox3RBgqnQEo7XPHpKONR5AXYAH4ASLa4XWXILiBC6r5LDBgWWDBRrKC5hsCEacIHawvMCIwvQC5QvQFAROEfZ5ADLJ4YGCywvVI7CPGC9IA/AH4AF"
+  )
+);
 
-    let WidgetLayouts = {
-      tl:{ x:0,             y:0,               Direction:0 },
-      tr:{ x:ScreenWidth-1, y:0,               Direction:1 },
-      bl:{ x:0,             y:ScreenHeight-24, Direction:0 },
-      br:{ x:ScreenWidth-1, y:ScreenHeight-24, Direction:1 }
-    };
+let rainIcon = require("heatshrink").decompress(
+  atob(
+    "mEwwhC/AH4AFgczmYWWDCgWDmcwIKAuEGBoSGGCAWKC7BIKIxYX6CpgABn4tUSJIWPJIwuQGAwWRGAoX/C+SPEU67XXGCIuFGCAWHAGeIBJEIwAVJhGIC5AJBC5QMJEJQMEC44JBC6QSCC54FHLxgNBBgYSEDgKpPMhQXneSwuUAH4A/AA4="
+  )
+);
 
-    for (let Widget of WIDGETS) {
-      let WidgetLayout = WidgetLayouts[Widget.area];     // reference, not copy!
-      if (WidgetLayout == null) { continue; }
+let stormIcon = require("heatshrink").decompress(
+  atob(
+    "mEwwhC/AFEzmcwCyoYUgYXDmYuVGAY0OFwocHC6pNLCxYXYJBQXuCxhhJRpgYKCyBKFFyIXFCyJIFC/4XaO66nU3eza6k7C4IWFGBwXBCwwwO3ewC5AZMC6RaCIxZiI3e7AYYwRCQIIBC4QwPIQIpDC5owDhYREIxgAEFIouNC4orDFyBGBGAcLC6BaFhYWRLSRIFISQXcCyqhRAH4Az"
+  )
+);
 
-      Widget.x = WidgetLayout.x - WidgetLayout.Direction * Widget.width;
-      Widget.y = WidgetLayout.y;
+// err icon - https://icons8.com/icons/set/error
+let errIcon = require("heatshrink").decompress(
+  atob(
+    "mEwwkBiIA/AH4AZUAIWUiAXBWqgXXdIYuVGCgXBgICCIyYXCJCQTDC6QrEMCQSEJCQRFC6ApGJCCiDDQSpQFAYXEJBqNGJCA/EC4ZIOEwgXFJBgNEAhKlNAgxIKBgoXEJBjsLC5TsIeRycMBhRrMMBKzQEozjOBxAgHGww+IA6wfSH4hnIC47OMSJqlRIJAXCACIXaGoQARPwwuTAH4A/ABw"
+  )
+);
 
-      WidgetLayout.x += Widget.width * (1-2*WidgetLayout.Direction);
-    }
+// config stuff
+let twentyFourHourTime = false;
+let useFahrenheit = false;
+let hourColor = "#F00";
+let minuteColor = "#FFF";
 
-    let x,y, dx,dy;
-    let cx = CenterX, cy = CenterY, r = outerRadius, r2 = r*r;
+// layout
+var clockLayout = new Layout({
+  type: "v",
+  lazy: true,
+  c: [
+    { type: "txt", font: "30%", label: "12:00", id: "hour"},
+    { type: "txt", font: "20%", label: "12:00", id: "minute" },
+    {type: "img",  id: "weatherIcon", src: sunIcon},
+    { type: "txt", font: "6x8", label: "", id: "tempandwind" },
+    { type: "txt", font: "6x8", label: "The Date", id: "date" },
+  ],
+});
 
-    x = WidgetLayouts.tl.x; y = WidgetLayouts.tl.y+24; dx = x - cx; dy = y - cy;
-    if (dx*dx + dy*dy < r2) {
-      cy = CenterY + 12; dy = y - cy; r2 = dx*dx + dy*dy; r = Math.sqrt(r2);
-    }
+function drawClock() {
+  const d = new Date();
+  let hour = d.getHours();
+  let minute = d.getMinutes();
+  let minuteString = ones[minute];
 
-    x = WidgetLayouts.tr.x; y = WidgetLayouts.tr.y+24; dx = x - cx; dy = y - cy;
-    if (dx*dx + dy*dy < r2) {
-      cy = CenterY + 12; dy = y - cy; r2 = dx*dx + dy*dy; r = Math.sqrt(r2);
-    }
+  if (minute > 0 && minute < 10) {
+    minuteString = singles[1] + " " + minuteString;
+  } else if (minute > 19) {
+    const firstDigitStr = String(minute)[0];
+    const firstDigitNum = Number(firstDigitStr);
 
-    x = WidgetLayouts.bl.x; y = WidgetLayouts.bl.y; dx = x - cx; dy = y - cy;
-    if (dx*dx + dy*dy < r2) {
-      cy = CenterY - 12; dy = y - cy; r2 = dx*dx + dy*dy; r = Math.sqrt(r2);
-    }
-
-    x = WidgetLayouts.br.x; y = WidgetLayouts.br.y; dx = x - cx; dy = y - cy;
-    if (dx*dx + dy*dy < r2) {
-      cy = CenterY - 12; dy = y - cy; r2 = dx*dx + dy*dy; r = Math.sqrt(r2);
-    }
-
-    CenterX = cx; CenterY = cy; outerRadius = r * 0.9;
+    minuteString = tens[firstDigitNum] + "\n" + ones[minute % 10];
   }
 
-  updateClockFaceSize();
+  let timeString = "";
 
-/**** custom version of Bangle.drawWidgets (does not clear the widget areas) ****/
+  if (false == twentyFourHourTime && hour > 12) {
+    hour = hour - 12;
+  }
 
-  Bangle.drawWidgets = function () {
-    var w = g.getWidth(), h = g.getHeight();
+  if (hour == 12 && minute == 0) {
+    timeString = "noon";
+  } else if (hour == 0 && minute == 0) {
+    timeString = "midnight";
+  } else if (hour != 12 && hour != 0 && minute == 0) {
+    timeString = ones[hour] + "\n o'clock";
+  } else {
+    timeString = ones[hour]; // + " \n" + minuteString;
+  }
 
-    var pos = {
-      tl:{x:0,   y:0,    r:0, c:0}, // if r==1, we're right->left
-      tr:{x:w-1, y:0,    r:1, c:0},
-      bl:{x:0,   y:h-24, r:0, c:0},
-      br:{x:w-1, y:h-24, r:1, c:0}
-    };
+  getDay();
+  getWeather();
+  clockLayout.hour.halign = "-1";
+  clockLayout.hour.col = hourColor;
+  clockLayout.hour.label = timeString;
 
-    if (global.WIDGETS) {
-      for (var wd of WIDGETS) {
-        var p = pos[wd.area];
-        if (!p) continue;
+  clockLayout.minute.halign = "-1";
+  clockLayout.minute.col = minuteColor;
+  clockLayout.minute.label = minuteString;
+  // g.setColor(255,0,0);
+  // g.setFont(fontFace,2);
+  // g.drawString(timeString, 1, 35);
+  // g.setColor(0,0,0);
+  // g.setFont(fontFace,2);
+  // g.drawString(minuteString, 1, 65);
+  clockLayout.clear();
+  clockLayout.render();
+}
 
-        wd.x = p.x - p.r*wd.width;
-        wd.y = p.y;
+function getDay() {
+  const d = new Date();
+  let dayOfWeek = d.getDay();
+  let dayOfMonth = d.getDate();
+  let month = months[d.getMonth()];
+  let dayString = days[dayOfWeek];
 
-        p.x += wd.width*(1-2*p.r);
-        p.c++;
+  g.setFont(fontFace, 1);
+  // g.drawString(
+  //   dayString + ", " + month + " " + dayOfMonth + " " + d.getFullYear(),
+  //   1,
+  //   160
+  // );
+  clockLayout.date.label = locale.date(d, 1).toUpperCase();
+}
+
+function getWeather() {
+  var weatherJson = storage.readJSON("weather.json");
+  if (weatherJson && weatherJson.weather) {
+    var currentWeather = weatherJson.weather;
+        const wind = locale.speed(currentWeather.wind).match(/^(\D*\d*)(.*)$/);
+    let temp = locale
+      .temp(currentWeather.temp - 273.15)
+      .match(/^(\D*\d*)(.*)$/);
+
+      clockLayout.tempandwind.label = temp[1] + " " + temp[2];
+	  // + ", " +  wind[1] +
+      // " " +
+      // wind[2] +
+      // " " +
+        // (currentWeather.wrose || "").toUpperCase();
+      // (currentWeather.wrose || "").toUpperCase();
+    const code = currentWeather.code || -1;
+    if (code > 0) {
+      clockLayout.weatherIcon.src = chooseIconByCode(code);
+    } else {
+      clockLayout.weatherIcon.src = chooseIcon(currentWeather.txt);
+    }
+
+  }
+}
+
+/**
+Choose weather icon to display based on condition.
+Based on function from the Bangle weather app so it should handle all of the conditions
+sent from gadget bridge.
+*/
+function chooseIcon(condition) {
+  condition = condition.toLowerCase();
+  if (condition.includes("thunderstorm")) return stormIcon;
+  if (
+    condition.includes("freezing") ||
+    condition.includes("snow") ||
+    condition.includes("sleet")
+  ) {
+    return snowIcon;
+  }
+  if (condition.includes("drizzle") || condition.includes("shower")) {
+    return rainIcon;
+  }
+  if (condition.includes("rain")) return rainIcon;
+  if (condition.includes("clear")) return sunIcon;
+  if (condition.includes("few clouds")) return partSunIcon;
+  if (condition.includes("scattered clouds")) return cloudIcon;
+  if (condition.includes("clouds")) return cloudIcon;
+  if (
+    condition.includes("mist") ||
+    condition.includes("smoke") ||
+    condition.includes("haze") ||
+    condition.includes("sand") ||
+    condition.includes("dust") ||
+    condition.includes("fog") ||
+    condition.includes("ash") ||
+    condition.includes("squalls") ||
+    condition.includes("tornado")
+  ) {
+    return cloudIcon;
+  }
+  return cloudIcon;
+}
+
+/*
+ * Choose weather icon to display based on weather conditition code
+ * https://openweathermap.org/weather-conditions#Weather-Condition-Codes-2
+ */
+function chooseIconByCode(code) {
+  const codeGroup = Math.round(code / 100);
+  switch (codeGroup) {
+    case 2:
+      return stormIcon;
+    case 3:
+      return rainIcon;
+    case 5:
+      return rainIcon;
+    case 6:
+      return snowIcon;
+    case 7:
+      return cloudIcon;
+    case 8:
+      switch (code) {
+        case 800:
+          return sunIcon;
+        case 801:
+          return partSunIcon;
+        default:
+          return cloudIcon;
       }
-
-      g.reset();                                 // also loads the current theme
-
-      if (pos.tl.c || pos.tr.c) {
-        g.setClipRect(0,h-24,w-1,h-1);
-        g.reset();                           // also (re)loads the current theme
-      }
-
-      if (pos.bl.c || pos.br.c) {
-        g.setClipRect(0,h-24,w-1,h-1);
-        g.reset();                           // also (re)loads the current theme
-      }
-
-      try {
-        for (wd of WIDGETS) {
-          g.clearRect(wd.x,wd.y, wd.x+wd.width-1,23);
-          wd.draw(wd);
-        }
-      } catch (e) { print(e); }
-    }
-  };
-
-  let innerRadius = Math.min(CenterX,CenterY) * 0.8 - 14;
-
-  let HourHandLength = outerRadius * 0.5;
-  let HourHandWidth  = 2*3, halfHourHandWidth = HourHandWidth/2;
-
-  let MinuteHandLength = outerRadius * 0.7;
-  let MinuteHandWidth  = 2*2, halfMinuteHandWidth = MinuteHandWidth/2;
-
-  let SecondHandLength = outerRadius * 0.9;
-  let SecondHandOffset = 6;
-
-  let twoPi  = 2*Math.PI;
-  let Pi     = Math.PI;
-  let halfPi = Math.PI/2;
-
-  let sin = Math.sin, cos = Math.cos;
-
-  let HourHandPolygon = [
-    -halfHourHandWidth,halfHourHandWidth,
-    -halfHourHandWidth,halfHourHandWidth-HourHandLength,
-     halfHourHandWidth,halfHourHandWidth-HourHandLength,
-     halfHourHandWidth,halfHourHandWidth,
-  ];
-
-  let MinuteHandPolygon = [
-    -halfMinuteHandWidth,halfMinuteHandWidth,
-    -halfMinuteHandWidth,halfMinuteHandWidth-MinuteHandLength,
-     halfMinuteHandWidth,halfMinuteHandWidth-MinuteHandLength,
-     halfMinuteHandWidth,halfMinuteHandWidth,
-  ];
-
-/**** drawClockFace ****/
-
-  function drawClockFace () {
-    for (let i = 0; i < 60; i++) {
-      let Phi = i * twoPi/60;
-
-      let x = CenterX + outerRadius * sin(Phi);
-      let y = CenterY - outerRadius * cos(Phi);
-
-      let Color = E.HSBtoRGB(i/60,1,1, true);
-      g.setColor(Color[0]/255,Color[1]/255,Color[2]/255);
-
-      g.fillCircle(x,y, 1);
-    }
-
-    g.setFont('Vector', 20);
-    g.setFontAlign(0,0);
-
-    for (let i = 0; i < 12; i++) {
-      let Phi = i * twoPi/12;
-
-      let Radius = innerRadius;
-      if (i >= 10) { Radius -= 4; }
-
-      let x = CenterX + Radius * sin(Phi);
-      let y = CenterY - Radius * cos(Phi);
-
-      let Color = E.HSBtoRGB(i/12,1,1, true);
-      g.setColor(Color[0]/255,Color[1]/255,Color[2]/255);
-
-      g.drawString(i == 0 ? '12' : '' + i, x,y);
-    }
+    default:
+      return cloudIcon;
   }
+}
 
-/**** transforme polygon ****/
+g.clear();
 
-  let transformedPolygon = new Array(HourHandPolygon.length);
+var drawTimeout;
 
-  function transformPolygon (originalPolygon, OriginX,OriginY, Phi) {
-    let sPhi = sin(Phi), cPhi = cos(Phi), x,y;
+//update watchface in next minute
+function queueDraw() {
+  if (drawTimeout) clearTimeout(drawTimeout);
+  drawTimeout = setTimeout(function () {
+    drawTimeout = undefined;
+    drawClock();
+    queueDraw();
+  }, 60000 - (Date.now() % 60000));
+}
 
-    for (let i = 0, l = originalPolygon.length; i < l; i+=2) {
-      x = originalPolygon[i];
-      y = originalPolygon[i+1];
-
-      transformedPolygon[i]   = OriginX + x*cPhi + y*sPhi;
-      transformedPolygon[i+1] = OriginY + x*sPhi - y*cPhi;
-    }
-  }
-
-/**** draw clock hands ****/
-
-  function drawClockHands () {
-    let now = new Date();
-
-    let Hours   = now.getHours() % 12;
-    let Minutes = now.getMinutes();
-    let Seconds = now.getSeconds();
-
-    let HoursAngle   = (Hours+(Minutes/60))/12 * twoPi - Pi;
-    let MinutesAngle = (Minutes/60)            * twoPi - Pi;
-    let SecondsAngle = (Seconds/60)            * twoPi - Pi;
-
-    g.setColor(g.theme.fg);
-
-    transformPolygon(HourHandPolygon, CenterX,CenterY, HoursAngle);
-    g.fillPoly(transformedPolygon);
-
-    transformPolygon(MinuteHandPolygon, CenterX,CenterY, MinutesAngle);
-    g.fillPoly(transformedPolygon);
-
-    let sPhi = Math.sin(SecondsAngle), cPhi = Math.cos(SecondsAngle);
-
-    g.setColor(g.theme.fg2);
-    g.drawLine(
-      CenterX + SecondHandOffset*sPhi,
-      CenterY - SecondHandOffset*cPhi,
-      CenterX - SecondHandLength*sPhi,
-      CenterY + SecondHandLength*cPhi
-    );
-  }
-
-/**** refreshDisplay ****/
-
-  let Timer;
-  function refreshDisplay () {
-    g.clear(true);                                   // also loads current theme
-
-    Bangle.drawWidgets();
-
-    drawClockFace();
-    drawClockHands();
-
-    let Pause = 1000 - (Date.now() % 1000);
-    Timer = setTimeout(refreshDisplay,Pause);
-  }
-
-  setTimeout(refreshDisplay, 500);                 // enqueue first draw request
-
-  Bangle.on('lcdPower', (on) => {
-    if (on) {
-      if (Timer != null) { clearTimeout(Timer); Timer = undefined; }
-      refreshDisplay();
-    }
-  });
-
-  Bangle.loadWidgets();
-
-  Bangle.setUI('clock');
+g.setBgColor(0,0,0);
+queueDraw();
+drawClock();
+Bangle.loadWidgets();
+Bangle.setUI("clock");
+Bangle.drawWidgets();
