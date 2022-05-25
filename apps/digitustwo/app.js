@@ -137,28 +137,30 @@ function drawClock() {
     minuteString = tens[firstDigitNum] + "\n" + ones[minute % 10];
   }
 
-  let timeString = "";
+  let hourString = "";
 
   if (false == twentyFourHourTime && hour > 12) {
     hour = hour - 12;
   }
 
+  clockLayout.minute.col = minuteColor;
   if (hour == 12 && minute == 0) {
-    timeString = "noon";
+    hourString = "noon";
   } else if (hour == 0 && minute == 0) {
-    timeString = "midnight";
+    hourString = "midnight";
   } else if (hour != 12 && hour != 0 && minute == 0) {
-    timeString = ones[hour] + "\n o'clock";
+    hourString = ones[hour];
+    minuteString = "o'clock";
+    clockLayout.minute.col = hourColor;
   } else {
-    timeString = ones[hour]; // + " \n" + minuteString;
+    hourString = ones[hour];
   }
 
   getDay();
   getWeather();
   clockLayout.hour.col = hourColor;
-  clockLayout.hour.label = timeString;
+  clockLayout.hour.label = hourString;
 
-  clockLayout.minute.col = minuteColor;
   clockLayout.minute.label = minuteString;
   g.clear();
   clockLayout.render();
