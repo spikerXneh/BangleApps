@@ -115,7 +115,7 @@ var clockLayout = new Layout({
   lazy: true,
   c: [
     { type: "txt", font: "20%", label: "12:00", id: "hour"},
-    { type: "txt", font: "20%", label: "12:00", id: "minute" },
+    { type: "txt", font: "10%", label: "12:00", id: "minute" },
     { type: "img",  id: "weatherIcon", src: sunIcon },
     { type: "txt", font: "6x8", label: "", id: "tempandwind" },
     { type: "txt", font: "6x8", label: "The Date", id: "date" },
