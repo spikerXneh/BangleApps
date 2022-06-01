@@ -114,9 +114,9 @@ var clockLayout = new Layout({
   type: "v",
   lazy: true,
   c: [
-    { type: "txt", font: "20%", label: "12:00", id: "hour"},
+    { type: "txt", font: "20%", label: "12:00", id: "hour" },
     { type: "txt", font: "10%", label: "12:00", id: "minute" },
-    { type: "img",  id: "weatherIcon", src: sunIcon },
+    { type: "img", id: "weatherIcon", src: sunIcon },
     { type: "txt", font: "6x8", label: "", id: "tempandwind" },
     { type: "txt", font: "6x8", label: "The Date", id: "date" },
   ],
@@ -146,10 +146,8 @@ function drawClock() {
   clockLayout.minute.col = minuteColor;
   if (hour == 12 && minute == 0) {
     hourString = "noon";
-  }
-  else if (hour == 12 && minute != 0 ){
+  } else if (hour == 12 && minute != 0) {
     hourString = ones[hour];
-  }
   } else if (hour == 0 && minute == 0) {
     hourString = "midnight";
   } else if (hour != 12 && hour != 0 && minute == 0) {
@@ -192,7 +190,6 @@ function getWeather() {
     } else {
       clockLayout.weatherIcon.src = chooseIcon(currentWeather.txt);
     }
-
   }
 }
 
@@ -280,7 +277,7 @@ function queueDraw() {
   }, 60000 - (Date.now() % 60000));
 }
 
-g.setBgColor(0,0,0);
+g.setBgColor(0, 0, 0);
 queueDraw();
 drawClock();
 Bangle.loadWidgets();
