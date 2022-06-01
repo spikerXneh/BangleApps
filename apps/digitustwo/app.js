@@ -146,6 +146,10 @@ function drawClock() {
   clockLayout.minute.col = minuteColor;
   if (hour == 12 && minute == 0) {
     hourString = "noon";
+  }
+  else if (hour == 12 && minute != 0 ){
+    hourString = ones[hour];
+  }
   } else if (hour == 0 && minute == 0) {
     hourString = "midnight";
   } else if (hour != 12 && hour != 0 && minute == 0) {
