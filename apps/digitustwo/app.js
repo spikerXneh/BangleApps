@@ -123,6 +123,7 @@ var clockLayout = new Layout({
 });
 
 function drawClock() {
+  clockLayout.clear();
   const d = new Date();
   let hour = d.getHours();
   let minute = d.getMinutes();
@@ -164,7 +165,7 @@ function drawClock() {
   clockLayout.hour.label = hourString;
 
   clockLayout.minute.label = minuteString;
-  g.clear();
+  // g.clear();
   clockLayout.render();
 }
 
