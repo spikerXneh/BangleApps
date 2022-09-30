@@ -273,7 +273,9 @@ function queueDraw() {
   if (drawTimeout) clearTimeout(drawTimeout);
   drawTimeout = setTimeout(function () {
     drawTimeout = undefined;
+    g.setBgColor(0, 0, 0);
     drawClock();
+    Bangle.drawWidgets();
     queueDraw();
   }, 60000 - (Date.now() % 60000));
 }
